@@ -1,42 +1,45 @@
-.book-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-.book-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.modal-overlay {
-    backdrop-filter: blur(3px);
-}
-
-@keyframes modalEnter {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes modalExit {
-    from {
-        opacity: 1;
-        transform: scale(1);
-    }
-    to {
-        opacity: 0;
-        transform: scale(0.95);
-    }
+@keyframes slideIn {
+    from { transform: translateY(-20px); }
+    to { transform: translateY(0); }
 }
 
 .modal-enter {
-    animation: modalEnter 0.3s ease-out;
+    animation: fadeIn 0.3s ease-in, slideIn 0.3s ease-out;
 }
 
-.modal-exit {
-    animation: modalExit 0.3s ease-in;
+.book-card {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.book-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+footer {
+    background: linear-gradient(160deg, #1a365d 0%, #0d1a2d 100%);
+}
+
+.social-icon {
+    transition: transform 0.2s ease;
+}
+
+.social-icon:hover {
+    transform: scale(1.1);
 }

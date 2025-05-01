@@ -1,34 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Advanced Book Management</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Library Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <header class="mb-8 flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">📚 My Library</h1>
-                <p class="text-gray-600">Manage your book collection efficiently</p>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-blue-800 text-white shadow-lg sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                <h1 class="text-2xl font-bold">Digital Library</h1>
             </div>
+            <div class="flex space-x-4">
+                <a href="#" class="hover:text-blue-200 transition-colors">About</a>
+                <a href="#" class="hover:text-blue-200 transition-colors">Contact</a>
+                <a href="#" class="hover:text-blue-200 transition-colors">FAQ</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="mb-8 flex justify-between items-center">
             <button onclick="toggleModal()"
-                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg flex items-center">
+                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg flex items-center transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                        clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                 </svg>
                 Add Book
             </button>
-        </header>
-
-        <div class="mb-8 flex justify-between items-center">
-            <input type="text" id="search" placeholder="Search books..."
-                class="w-64 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onkeyup="searchBooks()">
+            
             <div class="flex gap-4">
                 <div class="bg-white p-4 rounded-lg shadow">
                     <p class="text-gray-500">Total Books</p>
@@ -39,6 +44,12 @@
                     <p id="completed-books" class="text-2xl font-bold">0</p>
                 </div>
             </div>
+        </div>
+
+        <div class="mb-6">
+            <input type="text" id="search" placeholder="Search books..."
+                class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                onkeyup="searchBooks()">
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -54,27 +65,28 @@
         </div>
 
         <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white rounded-xl p-8 w-full max-w-md">
+            <div class="bg-white rounded-xl p-8 w-full max-w-md modal-enter">
                 <h3 class="text-2xl font-bold mb-6">📕 Add New Book</h3>
                 <form onsubmit="event.preventDefault(); addBook()">
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">Title</label>
-                        <input type="text" id="title" class="w-full px-4 py-2 border rounded-lg" required>
+                        <input type="text" id="title" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">Author</label>
-                        <input type="text" id="author" class="w-full px-4 py-2 border rounded-lg" required>
+                        <input type="text" id="author" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">Year</label>
-                        <input type="number" id="year" class="w-full px-4 py-2 border rounded-lg" required>
+                        <input type="number" id="year" min="0" max="2024" 
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     
                     <div class="mb-6">
                         <label class="block text-gray-700 mb-2">Status</label>
-                        <select id="status" class="w-full px-4 py-2 border rounded-lg">
+                        <select id="status" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                             <option value="unread">Unread</option>
                             <option value="read">Read</option>
                         </select>
@@ -82,17 +94,71 @@
 
                     <div class="flex justify-end gap-3">
                         <button type="button" onclick="toggleModal()"
-                            class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                            class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition-colors">
                             Cancel
                         </button>
-                        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
+                        <button type="submit" 
+                            class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
                             Save Book
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-    </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="font-bold mb-4">Digital Library</h3>
+                    <p class="text-sm text-gray-400">Your personal book management solution</p>
+                    <div class="mt-4 flex space-x-3">
+                        <a href="#" class="text-blue-400 hover:text-blue-300">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                        </a>
+                        <a href="#" class="text-blue-400 hover:text-blue-300">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-3">Collections</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Fiction</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Non-Fiction</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Classics</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Best Sellers</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-3">Support</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">FAQ</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Documentation</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-3">Legal</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Licenses</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-sm text-gray-400">
+                <p>© 2025 Digital Library. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <script src="buku.js"></script>
 </body>

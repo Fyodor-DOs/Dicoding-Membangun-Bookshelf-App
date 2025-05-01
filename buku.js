@@ -1,6 +1,60 @@
 let editId = null;
 
+function initializeDummyData() {
+    if (!localStorage.getItem('readBooks') && !localStorage.getItem('unreadBooks')) {
+        const dummyBooks = [
+            {
+                id: 1,
+                title: "To Kill a Mockingbird",
+                author: "Harper Lee",
+                year: 1960,
+                isComplete: true,
+                createdAt: "2024-01-01T09:00:00Z"
+            },
+            {
+                id: 2,
+                title: "1984",
+                author: "George Orwell",
+                year: 1949,
+                isComplete: false,
+                createdAt: "2024-01-02T10:00:00Z"
+            },
+            {
+                id: 3,
+                title: "Pride and Prejudice",
+                author: "Jane Austen",
+                year: 1813,
+                isComplete: true,
+                createdAt: "2024-01-03T11:00:00Z"
+            },
+            {
+                id: 4,
+                title: "The Great Gatsby",
+                author: "F. Scott Fitzgerald",
+                year: 1925,
+                isComplete: false,
+                createdAt: "2024-01-04T12:00:00Z"
+            },
+            {
+                id: 5,
+                title: "Moby Dick",
+                author: "Herman Melville",
+                year: 1851,
+                isComplete: true,
+                createdAt: "2024-01-05T13:00:00Z"
+            }
+        ];
+
+        const readBooks = dummyBooks.filter(book => book.isComplete);
+        const unreadBooks = dummyBooks.filter(book => !book.isComplete);
+
+        localStorage.setItem('readBooks', JSON.stringify(readBooks));
+        localStorage.setItem('unreadBooks', JSON.stringify(unreadBooks));
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    initializeDummyData();
     updateStats();
     displayBooks();
 });
@@ -8,80 +62,59 @@ document.addEventListener('DOMContentLoaded', () => {
 function toggleModal() {
     const modal = document.getElementById('modal');
     modal.classList.toggle('hidden');
-    
-    if (!modal.classList.contains('hidden')) {
-        modal.classList.add('modal-enter');
-        setTimeout(() => modal.classList.remove('modal-enter'), 300);
-    } else {
-        modal.classList.add('modal-exit');
-        setTimeout(() => modal.classList.remove('modal-exit'), 300);
-    }
-    
-    if (!modal.classList.contains('hidden')) {
-        editId = null;
-        document.getElementById('title').value = '';
-        document.getElementById('author').value = '';
-        document.getElementById('year').value = '';
-        document.getElementById('status').value = 'unread';
-    }
+    document.body.classList.toggle('overflow-hidden');
 }
 
 function addBook() {
     const title = document.getElementById('title').value.trim();
     const author = document.getElementById('author').value.trim();
-    const yearInput = document.getElementById('year').value;
+    const year = document.getElementById('year').value;
     const status = document.getElementById('status').value;
 
-    if (!title || !author || !yearInput) {
-        alert('Please fill in all fields!');
-        return;
-    }
-    
-    const year = parseInt(yearInput);
-    if (isNaN(year) || year < 0 || year > new Date().getFullYear()) {
-        alert('Please enter a valid publication year!');
+    if (!title || !author || !year) {
+        alert('Please fill in all required fields!');
         return;
     }
 
-    const book = {
+    const currentYear = new Date().getFullYear();
+    if (year < 0 || year > currentYear) {
+        alert(`Please enter a valid year between 0 and ${currentYear}`);
+        return;
+    }
+
+    const newBook = {
         id: editId || Date.now(),
         title,
         author,
-        year,
+        year: parseInt(year),
         isComplete: status === 'read',
         createdAt: new Date().toISOString()
     };
 
-    const shelf = book.isComplete ? 'read' : 'unread';
-
-    try {
-        if (editId) {
-            ['read', 'unread'].forEach(shelf => {
-                let books = JSON.parse(localStorage.getItem(`${shelf}Books`) || '[]');
-                books = books.filter(b => b.id !== editId);
-                localStorage.setItem(`${shelf}Books`, JSON.stringify(books));
-            });
-        }
-
-        let books = JSON.parse(localStorage.getItem(`${shelf}Books`) || []);
-        books.push(book);
-        localStorage.setItem(`${shelf}Books`, JSON.stringify(books));
-
-        displayBooks();
-        toggleModal();
-        updateStats();
-    } catch (error) {
-        console.error('Error saving book:', error);
-        alert('Failed to save book. Please try again.');
+    if (editId) {
+        ['read', 'unread'].forEach(shelf => {
+            let books = JSON.parse(localStorage.getItem(`${shelf}Books`) || '[]');
+            books = books.filter(book => book.id !== editId);
+            localStorage.setItem(`${shelf}Books`, JSON.stringify(books));
+        });
     }
+
+    const targetShelf = newBook.isComplete ? 'read' : 'unread';
+    const targetBooks = JSON.parse(localStorage.getItem(`${targetShelf}Books`) || '[]');
+    targetBooks.push(newBook);
+    localStorage.setItem(`${targetShelf}Books`, JSON.stringify(targetBooks));
+
+    displayBooks();
+    toggleModal();
+    updateStats();
 }
 
 function editBook(id) {
-    const books = [
+    const allBooks = [
         ...JSON.parse(localStorage.getItem('readBooks') || '[]'),
         ...JSON.parse(localStorage.getItem('unreadBooks') || '[]')
     ];
-    const book = books.find(b => b.id === id);
+    const book = allBooks.find(b => b.id === id);
 
     if (book) {
         editId = id;
@@ -95,17 +128,17 @@ function editBook(id) {
 
 function moveBook(id, fromShelf) {
     const fromBooks = JSON.parse(localStorage.getItem(`${fromShelf}Books`) || '[]');
-    const toShelf = fromShelf === 'read' ? 'unread' : 'read';
-    
     const bookIndex = fromBooks.findIndex(b => b.id === id);
+    
     if (bookIndex > -1) {
         const [book] = fromBooks.splice(bookIndex, 1);
         book.isComplete = !book.isComplete;
         
-        localStorage.setItem(`${fromShelf}Books`, JSON.stringify(fromBooks));
-        
+        const toShelf = book.isComplete ? 'read' : 'unread';
         const toBooks = JSON.parse(localStorage.getItem(`${toShelf}Books`) || '[]');
         toBooks.push(book);
+        
+        localStorage.setItem(`${fromShelf}Books`, JSON.stringify(fromBooks));
         localStorage.setItem(`${toShelf}Books`, JSON.stringify(toBooks));
         
         displayBooks();
@@ -141,26 +174,30 @@ function searchBooks() {
 
 function displayBooks(books) {
     const renderBook = (book, shelf) => `
-        <div class="book-card bg-gray-50 p-4 rounded-lg flex justify-between items-start">
-            <div>
-                <h4 class="font-semibold">${book.title}</h4>
-                <p class="text-sm text-gray-600">by ${book.author}</p>
-                <div class="mt-2 text-xs text-gray-500">
-                    <span>Year: ${book.year}</span>
-                    <span class="mx-2">•</span>
-                    <span>Added: ${new Date(book.createdAt).toLocaleDateString()}</span>
+        <div class="book-card bg-white p-4 rounded-lg shadow-md mb-3">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <h4 class="font-semibold text-lg">${book.title}</h4>
+                    <p class="text-gray-600 text-sm">by ${book.author}</p>
+                    <div class="mt-2 text-xs text-gray-500">
+                        <span>Published: ${book.year}</span>
+                        <span class="mx-2">•</span>
+                        <span>Added: ${new Date(book.createdAt).toLocaleDateString()}</span>
+                    </div>
                 </div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <button onclick="editBook(${book.id})" class="text-blue-500 hover:text-blue-700">
-                    ✏️ Edit
-                </button>
-                <button onclick="moveBook(${book.id}, '${shelf}')" class="text-green-500 hover:text-green-700">
-                    ${shelf === 'read' ? '⏪ Unread' : '✅ Read'}
-                </button>
-                <button onclick="deleteBook(${book.id}, '${shelf}')" class="text-red-500 hover:text-red-700">
-                    🗑️ Delete
-                </button>
+                <div class="flex flex-col gap-2 ml-4">
+                    <button onclick="editBook(${book.id})" class="text-blue-500 hover:text-blue-700 text-sm">
+                        ✏️ Edit
+                    </button>
+                    <button onclick="moveBook(${book.id}, '${shelf}')" 
+                        class="text-green-500 hover:text-green-700 text-sm">
+                        ${shelf === 'read' ? '⏪ Mark Unread' : '✅ Mark Read'}
+                    </button>
+                    <button onclick="deleteBook(${book.id}, '${shelf}')" 
+                        class="text-red-500 hover:text-red-700 text-sm">
+                        🗑️ Delete
+                    </button>
+                </div>
             </div>
         </div>
     `;
@@ -169,14 +206,8 @@ function displayBooks(books) {
     const readList = document.getElementById('read-list');
 
     if (books) {
-        unreadList.innerHTML = books
-            .filter(b => !b.isComplete)
-            .map(b => renderBook(b, 'unread'))
-            .join('');
-        readList.innerHTML = books
-            .filter(b => b.isComplete)
-            .map(b => renderBook(b, 'read'))
-            .join('');
+        unreadList.innerHTML = books.filter(b => !b.isComplete).map(b => renderBook(b, 'unread')).join('');
+        readList.innerHTML = books.filter(b => b.isComplete).map(b => renderBook(b, 'read')).join('');
     } else {
         unreadList.innerHTML = JSON.parse(localStorage.getItem('unreadBooks') || '[]')
             .map(b => renderBook(b, 'unread')).join('');
